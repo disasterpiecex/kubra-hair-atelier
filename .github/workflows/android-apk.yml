@@ -25,15 +25,9 @@ jobs:
           test -f tsconfig.json
           rm -f v1.1-src/App.tsx
           sed -i 's/StyleSheet\.absoluteFillObject/StyleSheet.absoluteFill/g' App.tsx
-          if [ -f v1.2-src/patch_v12.py ]; then
-            python v1.2-src/patch_v12.py App.tsx
-          fi
-          if [ -f v1.3-src/patch_v13.py ]; then
-            python v1.3-src/patch_v13.py App.tsx
-          fi
-          if [ -f v1.4-src/patch_v14.py ]; then
-            python v1.4-src/patch_v14.py App.tsx
-          fi
+          if [ -f v1.2-src/patch_v12.py ]; then python v1.2-src/patch_v12.py App.tsx; fi
+          if [ -f v1.3-src/patch_v13.py ]; then python v1.3-src/patch_v13.py App.tsx; fi
+          if [ -f v1.4-src/patch_v14.py ]; then python v1.4-src/patch_v14.py App.tsx; fi
           sed -i "s/opening-approved\.jpg/opening-approved.png/g" App.tsx
           node -p "'Building direct source version ' + require('./package.json').version"
 
@@ -43,7 +37,7 @@ jobs:
           sudo apt-get install -y -qq librsvg2-bin imagemagick
           rsvg-convert -w 1024 -h 1024 v1.3-src/icon-simplified.svg -o assets/icon.png
           cp assets/icon.png assets/adaptive-icon.png
-          convert v1.4-src/approved-opening.jpg -auto-orient -strip PNG24:assets/opening-approved.png
+          cp v1.4-src/approved-opening.png assets/opening-approved.png
           identify assets/icon.png assets/opening-approved.png
 
       - uses: actions/setup-node@v4
@@ -87,12 +81,10 @@ jobs:
           p = Path('android/app/build.gradle')
           s = p.read_text()
           marker = 'react {\n'
-          if marker not in s:
-              raise SystemExit('react { block not found in android/app/build.gradle')
+          if marker not in s: raise SystemExit('react { block not found in android/app/build.gradle')
           if 'debuggableVariants = []' not in s:
               s = s.replace(marker, marker + '    debuggableVariants = []\n', 1)
           p.write_text(s)
-          print('Configured debug variant to bundle JavaScript into the APK.')
           PY
 
       - name: Build standalone debug APK
@@ -107,20 +99,15 @@ jobs:
           python - <<'PY'
           from pathlib import Path
           logos=list(Path('.').rglob('splashscreen_logo.png'))
-          if not logos:
-              raise SystemExit('Packaged splash logo not found')
+          if not logos: raise SystemExit('Packaged splash logo not found')
           bad=[(str(p),p.stat().st_size) for p in logos if p.stat().st_size>200]
           print('Packaged splash resources:',[(str(p),p.stat().st_size) for p in logos])
-          if bad:
-              raise SystemExit(f'Legacy splash artwork still packaged: {bad}')
+          if bad: raise SystemExit(f'Legacy splash artwork still packaged: {bad}')
           PY
 
       - name: Verify bundled JavaScript exists
         run: |
-          unzip -l android/app/build/outputs/apk/debug/app-debug.apk | grep -E 'index.android.bundle|assets/.*bundle' || {
-            echo 'JavaScript bundle missing from APK'
-            exit 1
-          }
+          unzip -l android/app/build/outputs/apk/debug/app-debug.apk | grep -E 'index.android.bundle|assets/.*bundle' || { echo 'JavaScript bundle missing from APK'; exit 1; }
 
       - name: Collect APK
         run: |
