@@ -3,7 +3,7 @@ name: Build Android APK
 on:
   workflow_dispatch:
   push:
-    branches: [ main ]
+    branches: [ main, v1.1 ]
 
 jobs:
   build-apk:
@@ -14,10 +14,16 @@ jobs:
       - name: Prepare uploaded project
         run: |
           if [ -f kubra-hair-atelier-v1.0-android-build-ready.zip ]; then
+            rm -rf source
             mkdir source
             unzip -q kubra-hair-atelier-v1.0-android-build-ready.zip -d source
             cp -a source/kubra-hair-atelier-v1/. .
           fi
+          if [ -f v1.1-src/patch_v11.py ]; then
+            python v1.1-src/patch_v11.py
+          fi
+          test -f App.tsx
+          test -f app.json
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -27,6 +33,8 @@ jobs:
           java-version: '17'
       - name: Install dependencies
         run: npm install --no-audit --no-fund
+      - name: Typecheck
+        run: npx tsc --noEmit
       - name: Generate Android project
         run: npx expo prebuild --platform android --clean --non-interactive
       - name: Force JS bundle into debug APK
@@ -55,10 +63,11 @@ jobs:
       - name: Collect APK
         run: |
           mkdir -p dist
-          cp android/app/build/outputs/apk/debug/app-debug.apk dist/Kubra-Hair-Atelier-v1.0-standalone.apk
+          VERSION=$(node -p "require('./package.json').version")
+          cp android/app/build/outputs/apk/debug/app-debug.apk "dist/Kubra-Hair-Atelier-v${VERSION}-standalone.apk"
       - uses: actions/upload-artifact@v4
         with:
           name: Kubra-Hair-Atelier-Android-APK-Standalone
-          path: dist/Kubra-Hair-Atelier-v1.0-standalone.apk
+          path: dist/*.apk
           if-no-files-found: error
           retention-days: 30
