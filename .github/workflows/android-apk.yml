@@ -12,35 +12,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Prepare v1.1 project
+      - name: Prepare direct v1.1 source
         run: |
           rm -rf source
           mkdir source
           unzip -q kubra-hair-atelier-v1.0-android-build-ready.zip -d source
-          cp -a source/kubra-hair-atelier-v1/. .
-
-          if [ -f v1.1-src/App.tsx.gz.b64 ]; then
-            base64 -d v1.1-src/App.tsx.gz.b64 | gunzip > App.tsx
-          fi
-
-          python - <<'PY'
-          import json
-          from pathlib import Path
-
-          p = Path('package.json')
-          package = json.loads(p.read_text())
-          package['version'] = '1.1.1'
-          p.write_text(json.dumps(package, indent=2, ensure_ascii=False) + '\n')
-
-          a = Path('app.json')
-          app = json.loads(a.read_text())
-          app['expo']['version'] = '1.1.1'
-          app['expo']['android']['versionCode'] = 3
-          a.write_text(json.dumps(app, indent=2, ensure_ascii=False) + '\n')
-          PY
-
+          cp -a source/kubra-hair-atelier-v1/assets ./assets
           test -f App.tsx
+          test -f api.ts
           test -f app.json
+          test -f package.json
+          test -f tsconfig.json
+          echo "Building direct source version $(node -p \"require('./package.json').version\")"
 
       - uses: actions/setup-node@v4
         with:
