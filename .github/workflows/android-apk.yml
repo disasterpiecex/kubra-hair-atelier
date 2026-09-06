@@ -48,30 +48,6 @@ jobs:
       - name: Generate Android project
         run: npx expo prebuild --platform android --clean --non-interactive
 
-      - name: Add v1.2 Android full-exit module
-        run: |
-          if [ -f v1.2-src/KubraExitModule.kt ]; then
-            MAIN=$(find android/app/src/main/java -name MainApplication.kt | head -n 1)
-            test -n "$MAIN"
-            APP_DIR=$(dirname "$MAIN")
-            cp v1.2-src/KubraExitModule.kt "$APP_DIR/KubraExitModule.kt"
-            python - <<'PY'
-          from pathlib import Path
-          files = list(Path('android/app/src/main/java').rglob('MainApplication.kt'))
-          if not files:
-              raise SystemExit('MainApplication.kt not found')
-          p = files[0]
-          s = p.read_text()
-          needle = 'PackageList(this).packages.apply {'
-          if needle not in s:
-              raise SystemExit('React package list block not found')
-          if 'add(KubraExitPackage())' not in s:
-              s = s.replace(needle, needle + '\n          add(KubraExitPackage())', 1)
-          p.write_text(s)
-          print('Registered KubraExitPackage in', p)
-          PY
-          fi
-
       - name: Force JS bundle into debug APK
         run: |
           python - <<'PY'
