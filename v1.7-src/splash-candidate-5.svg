@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 1280">
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f7f2eb"/><stop offset="1" stop-color="#e7ddd3"/></linearGradient>
+  <linearGradient id="b1" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#ead9bf"/><stop offset=".5" stop-color="#c9aa80"/><stop offset="1" stop-color="#8e6548"/></linearGradient>
+  <linearGradient id="b2" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#d0b08d"/><stop offset=".5" stop-color="#9d704f"/><stop offset="1" stop-color="#513424"/></linearGradient>
+  <linearGradient id="b3" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#f0e4cf"/><stop offset=".5" stop-color="#d4bd9e"/><stop offset="1" stop-color="#9a765b"/></linearGradient>
+  <filter id="shadow"><feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#5b463b" flood-opacity=".18"/></filter>
+</defs>
+<rect width="720" height="1280" fill="url(#bg)"/>
+<path d="M0 170 C160 90 260 210 420 130 S680 40 720 80" fill="none" stroke="#ffffff" stroke-opacity=".45" stroke-width="54"/>
+<path d="M70 500 C210 390 330 460 470 390 S650 260 720 300" fill="none" stroke="#d8cec3" stroke-opacity=".45" stroke-width="3"/>
+<path d="M30 940 C180 870 280 980 440 900 S660 830 720 850" fill="none" stroke="#cfc2b8" stroke-opacity=".55" stroke-width="2"/>
+<g filter="url(#shadow)" transform="translate(0 80)">
+  <path d="M-40 40 C130 30 290 70 430 150 C500 190 610 220 760 205 L760 345 C590 350 450 310 315 240 C190 174 75 150 -40 160 Z" fill="url(#b2)"/>
+  <path d="M-35 135 C125 120 280 155 405 220 C500 270 610 305 760 290 L760 420 C610 430 465 392 345 335 C215 272 85 252 -35 270 Z" fill="url(#b1)"/>
+  <path d="M-30 250 C140 240 270 275 390 325 C505 374 620 405 760 395 L760 520 C620 530 475 502 350 448 C220 392 95 375 -30 385 Z" fill="url(#b3)"/>
+  <path d="M30 435 C180 420 325 452 445 505 C535 545 640 562 760 555 L760 675 C630 690 500 663 385 612 C265 559 145 540 30 555 Z" fill="url(#b2)"/>
+</g>
+<g opacity=".28" stroke="#fff" stroke-width="2">
+  <path d="M50 200 C220 185 385 225 660 338"/>
+  <path d="M60 320 C235 300 410 342 672 448"/>
+  <path d="M72 445 C248 430 425 470 675 575"/>
+  <path d="M95 595 C275 575 430 610 665 700"/>
+</g>
+<text x="360" y="980" text-anchor="middle" fill="#2b231f" font-size="70" letter-spacing="18" font-family="Georgia,serif">KÜBRA</text>
+<text x="360" y="1035" text-anchor="middle" fill="#4c413b" font-size="22" letter-spacing="10" font-family="Arial,sans-serif">HAIR ATELIER</text>
+<line x1="310" x2="410" y1="1080" y2="1080" stroke="#5f5148" stroke-width="2"/>
+</svg>
