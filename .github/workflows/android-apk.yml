@@ -23,6 +23,8 @@ jobs:
           test -f app.json
           test -f package.json
           test -f tsconfig.json
+          rm -f v1.1-src/App.tsx
+          sed -i 's/StyleSheet\.absoluteFillObject/StyleSheet.absoluteFill/g' App.tsx
           node -p "'Building direct source version ' + require('./package.json').version"
 
       - uses: actions/setup-node@v4
