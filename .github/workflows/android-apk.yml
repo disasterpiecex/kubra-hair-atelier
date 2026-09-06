@@ -3,7 +3,7 @@ name: Build Android APK
 on:
   workflow_dispatch:
   push:
-    branches: [ main, v1.1, v1.2, v1.3, v1.4, v1.5, v1.6 ]
+    branches: [ main, v1.1, v1.2, v1.3, v1.4, v1.5, v1.6, v1.7 ]
 
 jobs:
   build-apk:
@@ -40,6 +40,7 @@ jobs:
           s=re.sub(r'(<PhotoScreen\s+photoUri=\{photoUri\}\s+pick=\{pick\}\s+take=\{take\})(?!\s+remove=)', r'\1 remove={removePhoto}', s)
           p.write_text(s)
           PY
+          if [ -f v1.7-src/patch_v17.py ]; then python v1.7-src/patch_v17.py App.tsx; fi
           node -p "'Building direct source version ' + require('./package.json').version"
 
       - name: Render brand assets
@@ -50,7 +51,10 @@ jobs:
           cp assets/icon.png assets/adaptive-icon.png
           cp v1.4-src/approved-opening.png assets/opening-approved.png
           curl -L --fail --retry 3 'https://images.unsplash.com/photo-1767051239621-c59dbc6d08ec?auto=format&fit=crop&fm=jpg&q=85&w=1400' -o assets/v15-opening.jpg
-          identify assets/icon.png assets/adaptive-icon.png assets/v15-opening.jpg
+          base64 -d v1.7-src/splash-candidate-5.jpg.b64 > assets/v17-opening.jpg
+          rsvg-convert -w 1024 -h 1024 v1.7-src/icon-purple-4.svg -o assets/icon.png
+          cp assets/icon.png assets/adaptive-icon.png
+          identify assets/icon.png assets/adaptive-icon.png assets/v15-opening.jpg assets/v17-opening.jpg
 
       - uses: actions/setup-node@v4
         with:
