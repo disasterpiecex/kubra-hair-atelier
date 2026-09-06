@@ -30,16 +30,16 @@ jobs:
           if [ -f v1.4-src/patch_v14.py ]; then python v1.4-src/patch_v14.py App.tsx; fi
           sed -i "s/opening-approved\.jpg/opening-approved.png/g" App.tsx
           if [ -f v1.5-src/patch_v15.py ]; then python v1.5-src/patch_v15.py App.tsx; fi
-          cp v1.5-src/v15-opening.jpg assets/v15-opening.jpg
           node -p "'Building direct source version ' + require('./package.json').version"
 
       - name: Render v1.5 brand assets
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y -qq librsvg2-bin imagemagick
+          sudo apt-get install -y -qq librsvg2-bin imagemagick curl
           rsvg-convert -w 1024 -h 1024 v1.3-src/icon-simplified.svg -o assets/icon.png
           cp assets/icon.png assets/adaptive-icon.png
           cp v1.4-src/approved-opening.png assets/opening-approved.png
+          curl -L --fail --retry 3 'https://images.unsplash.com/photo-1767051239621-c59dbc6d08ec?auto=format&fit=crop&fm=jpg&q=85&w=1400' -o assets/v15-opening.jpg
           identify assets/icon.png assets/adaptive-icon.png assets/v15-opening.jpg
 
       - uses: actions/setup-node@v4
