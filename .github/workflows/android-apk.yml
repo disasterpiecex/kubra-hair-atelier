@@ -11,32 +11,55 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
-      - name: Prepare uploaded project
+
+      - name: Prepare v1.1 project
         run: |
-          if [ -f kubra-hair-atelier-v1.0-android-build-ready.zip ]; then
-            rm -rf source
-            mkdir source
-            unzip -q kubra-hair-atelier-v1.0-android-build-ready.zip -d source
-            cp -a source/kubra-hair-atelier-v1/. .
+          rm -rf source
+          mkdir source
+          unzip -q kubra-hair-atelier-v1.0-android-build-ready.zip -d source
+          cp -a source/kubra-hair-atelier-v1/. .
+
+          if [ -f v1.1-src/App.tsx.gz.b64 ]; then
+            base64 -d v1.1-src/App.tsx.gz.b64 | gunzip > App.tsx
           fi
-          if [ -f v1.1-src/patch_v11.py ]; then
-            python v1.1-src/patch_v11.py
-          fi
+
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          p = Path('package.json')
+          package = json.loads(p.read_text())
+          package['version'] = '1.1.1'
+          p.write_text(json.dumps(package, indent=2, ensure_ascii=False) + '\n')
+
+          a = Path('app.json')
+          app = json.loads(a.read_text())
+          app['expo']['version'] = '1.1.1'
+          app['expo']['android']['versionCode'] = 3
+          a.write_text(json.dumps(app, indent=2, ensure_ascii=False) + '\n')
+          PY
+
           test -f App.tsx
           test -f app.json
+
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
+
       - name: Install dependencies
         run: npm install --no-audit --no-fund
+
       - name: Typecheck
         run: npx tsc --noEmit
+
       - name: Generate Android project
         run: npx expo prebuild --platform android --clean --non-interactive
+
       - name: Force JS bundle into debug APK
         run: |
           python - <<'PY'
@@ -51,20 +74,24 @@ jobs:
           p.write_text(s)
           print('Configured debug variant to bundle JavaScript into the APK.')
           PY
+
       - name: Build standalone debug APK
         working-directory: android
         run: ./gradlew assembleDebug --no-daemon
+
       - name: Verify bundled JavaScript exists
         run: |
           unzip -l android/app/build/outputs/apk/debug/app-debug.apk | grep -E 'index.android.bundle|assets/.*bundle' || {
             echo 'JavaScript bundle missing from APK'
             exit 1
           }
+
       - name: Collect APK
         run: |
           mkdir -p dist
           VERSION=$(node -p "require('./package.json').version")
           cp android/app/build/outputs/apk/debug/app-debug.apk "dist/Kubra-Hair-Atelier-v${VERSION}-standalone.apk"
+
       - uses: actions/upload-artifact@v4
         with:
           name: Kubra-Hair-Atelier-Android-APK-Standalone
