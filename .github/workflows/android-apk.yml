@@ -3,7 +3,7 @@ name: Build Android APK
 on:
   workflow_dispatch:
   push:
-    branches: [ main, v1.1, v1.2 ]
+    branches: [ main, v1.1, v1.2, v1.3 ]
 
 jobs:
   build-apk:
@@ -28,7 +28,19 @@ jobs:
           if [ -f v1.2-src/patch_v12.py ]; then
             python v1.2-src/patch_v12.py App.tsx
           fi
+          if [ -f v1.3-src/patch_v13.py ]; then
+            python v1.3-src/patch_v13.py App.tsx
+          fi
           node -p "'Building direct source version ' + require('./package.json').version"
+
+      - name: Render v1.3 brand artwork
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq librsvg2-bin
+          rsvg-convert -w 1024 -h 1024 v1.3-src/icon-simplified.svg -o assets/icon.png
+          cp assets/icon.png assets/adaptive-icon.png
+          rsvg-convert -w 1080 -h 1600 v1.3-src/opening-hair.svg -o assets/opening-hair.png
+          file assets/icon.png assets/opening-hair.png
 
       - uses: actions/setup-node@v4
         with:
@@ -46,7 +58,9 @@ jobs:
         run: npx tsc --noEmit
 
       - name: Generate Android project
-        run: npx expo prebuild --platform android --clean --non-interactive
+        env:
+          CI: '1'
+        run: npx expo prebuild --platform android --clean
 
       - name: Force JS bundle into debug APK
         run: |
