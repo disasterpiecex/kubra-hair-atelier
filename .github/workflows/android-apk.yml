@@ -3,7 +3,7 @@ name: Build Android APK
 on:
   workflow_dispatch:
   push:
-    branches: [ main, v1.1, v1.2, v1.3 ]
+    branches: [ main, v1.1, v1.2, v1.3, v1.4 ]
 
 jobs:
   build-apk:
@@ -31,17 +31,19 @@ jobs:
           if [ -f v1.3-src/patch_v13.py ]; then
             python v1.3-src/patch_v13.py App.tsx
           fi
-          sed -i "s#opening-hair.jpg#opening-hair.png#g" App.tsx
+          if [ -f v1.4-src/patch_v14.py ]; then
+            python v1.4-src/patch_v14.py App.tsx
+          fi
+          cp v1.4-src/approved-opening.jpg assets/opening-approved.jpg
           node -p "'Building direct source version ' + require('./package.json').version"
 
-      - name: Render v1.3 brand artwork
+      - name: Render v1.4 icon
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq librsvg2-bin
           rsvg-convert -w 1024 -h 1024 v1.3-src/icon-simplified.svg -o assets/icon.png
           cp assets/icon.png assets/adaptive-icon.png
-          rsvg-convert -w 1080 -h 1600 v1.3-src/opening-hair.svg -o assets/opening-hair.png
-          file assets/icon.png assets/opening-hair.png
+          file assets/icon.png assets/opening-approved.jpg
 
       - uses: actions/setup-node@v4
         with:
@@ -63,6 +65,22 @@ jobs:
           CI: '1'
         run: npx expo prebuild --platform android --clean
 
+      - name: Remove legacy Android splash artwork
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import base64
+          # 1x1 transparent PNG. Android 12 keeps its mandatory native splash,
+          # but there is no visible artwork before the branded React opening.
+          transparent = base64.b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=')
+          logos=list(Path('android/app/src/main/res').rglob('splashscreen_logo.png'))
+          if not logos:
+              raise SystemExit('No splashscreen_logo.png resources found')
+          for p in logos:
+              p.write_bytes(transparent)
+              print('Neutralized',p)
+          PY
+
       - name: Force JS bundle into debug APK
         run: |
           python - <<'PY'
@@ -81,6 +99,22 @@ jobs:
       - name: Build standalone debug APK
         working-directory: android
         run: ./gradlew assembleDebug --no-daemon
+
+      - name: Verify legacy grid is absent from APK
+        run: |
+          rm -rf splash-check && mkdir splash-check
+          cd splash-check
+          unzip -q ../android/app/build/outputs/apk/debug/app-debug.apk 'res/*/splashscreen_logo.png' || true
+          python - <<'PY'
+          from pathlib import Path
+          logos=list(Path('.').rglob('splashscreen_logo.png'))
+          if not logos:
+              raise SystemExit('Packaged splash logo not found')
+          bad=[(str(p),p.stat().st_size) for p in logos if p.stat().st_size>200]
+          print('Packaged splash resources:',[(str(p),p.stat().st_size) for p in logos])
+          if bad:
+              raise SystemExit(f'Legacy splash artwork still packaged: {bad}')
+          PY
 
       - name: Verify bundled JavaScript exists
         run: |
