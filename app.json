@@ -1,0 +1,37 @@
+{
+  "expo": {
+    "name": "Kübra Hair Atelier",
+    "slug": "kubra-hair-atelier",
+    "version": "1.1.2",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#F3EEE8"
+    },
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Kübra Hair Atelier uses your selected photo to preview hair colors.",
+          "cameraPermission": "Kübra Hair Atelier uses the camera so you can take a photo for your hair-color preview.",
+          "microphonePermission": false
+        }
+      ]
+    ],
+    "android": {
+      "package": "com.kubra.hairatelier",
+      "versionCode": 4,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#F3EEE8"
+      }
+    },
+    "ios": {
+      "bundleIdentifier": "com.kubra.hairatelier",
+      "buildNumber": "4"
+    }
+  }
+}
