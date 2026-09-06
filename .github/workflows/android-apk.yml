@@ -32,6 +32,7 @@ jobs:
           if [ -f v1.5-src/patch_v15.py ]; then python v1.5-src/patch_v15.py App.tsx; fi
           sed -i 's/ remove={removePhoto}//g' App.tsx
           if [ -f v1.6-src/patch_v16.py ]; then python v1.6-src/patch_v16.py App.tsx; fi
+          sed -i 's/<PhotoScreen photoUri={photoUri} pick={pick} take={take} next={preview}\/>/<PhotoScreen photoUri={photoUri} pick={pick} take={take} remove={removePhoto} next={preview}\/>/g' App.tsx
           node -p "'Building direct source version ' + require('./package.json').version"
 
       - name: Render brand assets
