@@ -34,16 +34,17 @@ jobs:
           if [ -f v1.4-src/patch_v14.py ]; then
             python v1.4-src/patch_v14.py App.tsx
           fi
-          cp v1.4-src/approved-opening.jpg assets/opening-approved.jpg
+          sed -i "s/opening-approved\.jpg/opening-approved.png/g" App.tsx
           node -p "'Building direct source version ' + require('./package.json').version"
 
-      - name: Render v1.4 icon
+      - name: Render v1.4 brand assets
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y -qq librsvg2-bin
+          sudo apt-get install -y -qq librsvg2-bin imagemagick
           rsvg-convert -w 1024 -h 1024 v1.3-src/icon-simplified.svg -o assets/icon.png
           cp assets/icon.png assets/adaptive-icon.png
-          file assets/icon.png assets/opening-approved.jpg
+          convert v1.4-src/approved-opening.jpg -auto-orient -strip PNG24:assets/opening-approved.png
+          identify assets/icon.png assets/opening-approved.png
 
       - uses: actions/setup-node@v4
         with:
@@ -70,8 +71,6 @@ jobs:
           python - <<'PY'
           from pathlib import Path
           import base64
-          # 1x1 transparent PNG. Android 12 keeps its mandatory native splash,
-          # but there is no visible artwork before the branded React opening.
           transparent = base64.b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=')
           logos=list(Path('android/app/src/main/res').rglob('splashscreen_logo.png'))
           if not logos:
