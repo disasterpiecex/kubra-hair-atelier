@@ -2,7 +2,7 @@
   "expo": {
     "name": "Kübra Hair Atelier",
     "slug": "kubra-hair-atelier",
-    "version": "1.7.0",
+    "version": "1.7.2",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
     "icon": "./assets/icon.png",
@@ -21,7 +21,7 @@
     ],
     "android": {
       "package": "com.kubra.hairatelier",
-      "versionCode": 11,
+      "versionCode": 13,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#5B3B54"
@@ -29,7 +29,7 @@
     },
     "ios": {
       "bundleIdentifier": "com.kubra.hairatelier",
-      "buildNumber": "11"
+      "buildNumber": "13"
     }
   }
 }
