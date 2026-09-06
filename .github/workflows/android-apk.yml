@@ -29,16 +29,36 @@ jobs:
         run: npm install --no-audit --no-fund
       - name: Generate Android project
         run: npx expo prebuild --platform android --clean --non-interactive
-      - name: Build installable debug APK
+      - name: Force JS bundle into debug APK
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('android/app/build.gradle')
+          s = p.read_text()
+          marker = 'react {\n'
+          if marker not in s:
+              raise SystemExit('react { block not found in android/app/build.gradle')
+          if 'debuggableVariants = []' not in s:
+              s = s.replace(marker, marker + '    debuggableVariants = []\n', 1)
+          p.write_text(s)
+          print('Configured debug variant to bundle JavaScript into the APK.')
+          PY
+      - name: Build standalone debug APK
         working-directory: android
         run: ./gradlew assembleDebug --no-daemon
+      - name: Verify bundled JavaScript exists
+        run: |
+          unzip -l android/app/build/outputs/apk/debug/app-debug.apk | grep -E 'index.android.bundle|assets/.*bundle' || {
+            echo 'JavaScript bundle missing from APK'
+            exit 1
+          }
       - name: Collect APK
         run: |
           mkdir -p dist
-          cp android/app/build/outputs/apk/debug/app-debug.apk dist/Kubra-Hair-Atelier-v1.0-debug.apk
+          cp android/app/build/outputs/apk/debug/app-debug.apk dist/Kubra-Hair-Atelier-v1.0-standalone.apk
       - uses: actions/upload-artifact@v4
         with:
-          name: Kubra-Hair-Atelier-Android-APK
-          path: dist/Kubra-Hair-Atelier-v1.0-debug.apk
+          name: Kubra-Hair-Atelier-Android-APK-Standalone
+          path: dist/Kubra-Hair-Atelier-v1.0-standalone.apk
           if-no-files-found: error
           retention-days: 30
