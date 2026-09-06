@@ -31,6 +31,7 @@ jobs:
           if [ -f v1.3-src/patch_v13.py ]; then
             python v1.3-src/patch_v13.py App.tsx
           fi
+          sed -i "s#opening-hair.jpg#opening-hair.png#g" App.tsx
           node -p "'Building direct source version ' + require('./package.json').version"
 
       - name: Render v1.3 brand artwork
