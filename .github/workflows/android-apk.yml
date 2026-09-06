@@ -3,7 +3,7 @@ name: Build Android APK
 on:
   workflow_dispatch:
   push:
-    branches: [ main, v1.1, v1.2, v1.3, v1.4, v1.5, v1.6, v1.7 ]
+    branches: [ main, v1.1, v1.2, v1.3, v1.4, v1.5, v1.6, v1.7, v1.7.2 ]
 
 jobs:
   build-apk:
@@ -41,6 +41,7 @@ jobs:
           p.write_text(s)
           PY
           if [ -f v1.7-src/patch_v17.py ]; then python v1.7-src/patch_v17.py App.tsx; fi
+          if [ -f v1.7.2-src/patch_v172.py ]; then python v1.7.2-src/patch_v172.py App.tsx; fi
           node -p "'Building direct source version ' + require('./package.json').version"
 
       - name: Render brand assets
