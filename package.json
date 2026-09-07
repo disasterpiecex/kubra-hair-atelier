@@ -1,6 +1,6 @@
 {
   "name": "kubra-hair-atelier",
-  "version": "1.7.2",
+  "version": "1.8.0",
   "private": true,
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
@@ -17,6 +17,8 @@
   "dependencies": {
     "@react-native-async-storage/async-storage": "^2.2.0",
     "expo": "~57.0.17",
+    "expo-file-system": "~57.0.6",
+    "expo-image-manipulator": "~57.0.16",
     "expo-image-picker": "~57.0.16",
     "expo-status-bar": "~57.0.0",
     "react": "19.2.3",
