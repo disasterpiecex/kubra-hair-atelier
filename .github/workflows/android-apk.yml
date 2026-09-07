@@ -44,6 +44,7 @@ jobs:
           if [ -f v1.7.2-src/patch_v172.py ]; then python v1.7.2-src/patch_v172.py App.tsx; fi
           if [ -f v1.8-src/patch_v18.py ]; then python v1.8-src/patch_v18.py App.tsx; fi
           if [ -f v1.8-src/patch_v18_exit.py ]; then python v1.8-src/patch_v18_exit.py App.tsx; fi
+          if [ -f v1.8-src/patch_v18_optional_ai.py ]; then python v1.8-src/patch_v18_optional_ai.py App.tsx; fi
           node -p "'Building direct source version ' + require('./package.json').version"
 
       - name: Render brand assets
